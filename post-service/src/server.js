@@ -8,6 +8,9 @@ const postRoutes = require("./routes/post-routes");
 const errorHandler = require("./middleware/errorHandler");
 const logger = require("./utils/logger");
 const { connectToRabbitMQ } = require("./utils/rabbitmq");
+const {rateLimit}=require('express-rate-limit')
+const { RedisStore } = require("rate-limit-redis");
+const { RateLimiterRedis } = require("rate-limiter-flexible");
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -32,6 +35,22 @@ app.use((req, res, next) => {
 });
 
 //*** Homework - implement Ip based rate limiting for sensitive endpoints
+// ip based rate limiting for the sensitive endpoints
+const sensitiveEndpointsLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 70,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Sensitive endpoint ratelimiter exceeded for Ip ${req.ip}`);
+    res.status(429).json({ success: false, message: "too many requests" });
+  },
+  store: new RedisStore({
+    sendCommand: (...args) => redisClient.call(...args),
+  }),
+});
+
+app.use('/api/posts/create-post', sensitiveEndpointsLimiter);
 
 //routes -> pass redisclient to routes
 app.use(
