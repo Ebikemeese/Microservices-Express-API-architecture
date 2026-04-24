@@ -1,6 +1,6 @@
 # 🚀 Microservices Blog API (Express.js)
 
-A scalable Express.js microservices API for a blogging platform, featuring Post, Identity (auth), Search, and Media services, powered by RabbitMQ, Redis, Cloudinary, Docker, and GitHub Actions.
+A scalable Express.js microservices API for a blogging platform, featuring Post, Identity (authentication), Search, and Media services, powered by RabbitMQ, Redis, Cloudinary, Docker, and GitHub Actions.
 
 ---
 
